@@ -1,0 +1,79 @@
+total_particles: 50
+num_nodes: 1
+
+max_query_budget: 1000000000000
+max_it: 37500
+n_seeds: 5
+
+success_thresh: 0.2
+track_history: false
+
+problem_groups:
+  Cross-entropy: [mnist_paper, mnist_b512_ce]
+  0-1 loss (not differentiable): [mnist_b512_01]
+  Disjoint data per node: [mnist_paper_fed]
+
+problems:
+  - {name: mlp, label: mnist_paper, dataset: mnist, hidden: 0, head: paper,
+     batch: 64, log_every: 500, partition: false, display: accuracy}
+  - {name: mlp, label: mnist_paper_fed, dataset: mnist, hidden: 0, head: paper,
+     batch: 64, log_every: 500, partition: true, display: accuracy}
+
+  - {name: mlp, label: mnist_b512_ce, dataset: mnist, hidden: 0, head: paper,
+     batch: 512, log_every: 500, partition: false, loss: ce, display: accuracy}
+  - {name: mlp, label: mnist_b512_01, dataset: mnist, hidden: 0, head: paper,
+     batch: 512, log_every: 500, partition: false, loss: '01', display: accuracy}
+
+cbo_kwargs:
+  dt: 0.4
+  sigma: 0.1
+  alpha: 1.0
+  noise: anisotropic
+  f_dim: '3D'
+  verbosity: 0
+
+scheduler:
+  name: multiply
+  factor: 1.05
+  maximum: 1.0e+9
+
+resampling:
+  criteria:
+    - {name: loss_update, wait_thresh: 50}
+  sigma_indep: 0.01
+
+methods:
+  - name: serial
+    label: serial_cbo
+    skip_problems: [mnist_paper_fed]
+
+  - name: decentralized
+    label: decentralized_ring
+    num_nodes: 20
+    total_particles: 1000
+    mixing: {name: ring, lam: 0.5}
+    compute_z_mode: tracking
+
+  - name: serial
+    label: serial_matched_batch
+    hide_in_table: true
+    problem_overrides: {batch: 1280}
+    skip_problems: [mnist_paper_fed, mnist_b512_ce, mnist_b512_01]
+
+  - name: sgd
+    label: sgd_best_of_restarts
+    sgd_kwargs: {n_restarts: 1000, steps: 10000, lr: 0.3}
+    skip_problems: [mnist_paper_fed, mnist_b512_01]
+
+  - name: serial
+    label: serial_1000p
+    total_particles: 1000
+    hide_in_table: true
+    skip_problems: [mnist_paper_fed, mnist_b512_ce, mnist_b512_01]
+
+  - name: serial
+    label: serial_1000p_matched
+    total_particles: 1000
+    problem_overrides: {batch: 1280}
+    hide_in_table: true
+    skip_problems: [mnist_paper_fed, mnist_b512_ce, mnist_b512_01]

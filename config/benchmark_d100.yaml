@@ -1,0 +1,70 @@
+d: 100
+total_particles: 160
+num_nodes: 8
+
+max_query_budget: 1000000000000
+max_it: 20000
+n_seeds: 20
+
+success_thresh: 1.0e-4
+track_history: false
+
+shift_optimum: true
+
+problems:
+  - name: rastrigin
+    success_thresh: 1.0e-4
+  - name: ackley
+    success_thresh: 1.0e-4
+  - name: alpine
+    success_thresh: 1.0e-4
+  - name: styblinski_tang
+    success_thresh: 1.0e-4
+  - name: lunacek
+    success_thresh: 1.0e-4
+  - name: katsuura
+    success_thresh: 1.0e-4
+
+cbo_kwargs:
+  dt: 0.01
+  sigma: 5.0
+  alpha: 1.0e-4
+  noise: anisotropic
+  f_dim: '3D'
+  verbosity: 0
+
+scheduler:
+  name: multiply
+  factor: 1.05
+  maximum: 1.0e+9
+
+resampling:
+  criteria:
+    - {name: loss_update, wait_thresh: 50}
+  sigma_indep: 0.1
+
+methods:
+  - name: serial
+    cbo_kwargs: {dt: 0.01, sigma: 5.0, alpha: 1.0e-4}
+    resampling: {criteria: [{name: loss_update, wait_thresh: 50}], sigma_indep: 0.01}
+
+  - name: multirun
+    cbo_kwargs: {dt: 0.02, sigma: 3., alpha: 1.0e-4}
+
+  - name: decentralized
+    label: decentralized_ring
+    cbo_kwargs: {dt: 0.02, sigma: 3., alpha: 1.0e-4}
+    mixing: {name: ring, lam: 0.5}
+    compute_z_mode: tracking
+  - name: decentralized
+    label: decentralized_ring_many_particles
+    total_particles: 1280
+    num_nodes: 8
+    cbo_kwargs: {dt: 0.01, sigma: 3., alpha: 1.0e-4}
+    mixing: {name: ring, lam: 0.5}
+    compute_z_mode: tracking
+    resampling: {criteria: [{name: loss_update, wait_thresh: 50}], sigma_indep: 0.01}
+
+  - name: cma
+    label: cma_best_of_8
+    cma_kwargs: {noise_handling: false, diagonal: false, n_restarts: 8}

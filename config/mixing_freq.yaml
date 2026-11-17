@@ -1,0 +1,44 @@
+d: 50
+total_particles: 160
+num_nodes: 8
+
+max_query_budget: 1000000000000
+max_it: 5000
+n_seeds: 20
+
+success_thresh: 0.1
+track_history: false
+
+shift_optimum: true
+
+problems:
+  - {name: ackley, label: ackley_d50, d: 50}
+
+sweep:
+  base: {name: decentralized, compute_z_mode: tracking}
+  update_mixing_freq: [1, 2, 5, 10, 20, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 90,
+                       100, 200, 500, 1000, 2000, 3000, 4000, 5000]
+  mixing_name: [ring, ring_2hop, full, identity]
+
+plot:
+  x: update_mixing_freq
+  line: mixing_name
+  baseline: identity
+
+cbo_kwargs:
+  dt: 0.05
+  sigma: 3.0
+  alpha: 1.0e-4
+  noise: anisotropic
+  f_dim: '3D'
+  verbosity: 0
+
+scheduler:
+  name: multiply
+  factor: 1.05
+  maximum: 1.0e+9
+
+resampling:
+  criteria:
+    - {name: ensemble_update, update_thresh: 1.0e-4}
+  sigma_indep: 0.1

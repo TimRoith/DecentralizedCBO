@@ -1,0 +1,41 @@
+d: 100
+total_particles: 160
+num_nodes: 8
+
+max_query_budget: 1000000000000
+max_it: 5000
+n_seeds: 20
+
+success_thresh: 10.0
+track_history: false
+
+clipping: false
+
+problems:
+  - {name: rastrigin, label: rastrigin_d100, d: 100}
+
+sweep:
+  base: {name: decentralized, mixing: {name: ring}, compute_z_mode: tracking}
+  num_nodes: [8]
+  N:         [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+  dt:         [0.02]
+  mixing_lam: [0., 0.5, 1.0]
+  sigma:      [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0]
+
+plot:
+  x: sigma
+  y: N
+  facet: mixing_lam
+
+cbo_kwargs:
+  dt: 0.02
+  sigma: 2.5
+  alpha: 1.0e-4
+  noise: anisotropic
+  f_dim: '3D'
+  verbosity: 0
+
+scheduler:
+  name: multiply
+  factor: 1.05
+  maximum: 1.0e+9

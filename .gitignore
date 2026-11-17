@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+
+.venv/
+venv/
+env/
+.env
+
+.vscode/
+.ipynb_checkpoints
+
+# downloaded datasets
+data/
+
+# cluster logs
+slogs/
+
+# generated results: the run cache, tables and figures
+results/

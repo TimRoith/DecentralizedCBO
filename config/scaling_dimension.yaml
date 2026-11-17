@@ -1,0 +1,53 @@
+d: 50
+total_particles: 160
+num_nodes: 8
+
+max_query_budget: 1000000000000
+max_it: 5000
+n_seeds: 10
+
+success_thresh: 0.1
+track_history: false
+
+shift_optimum: true
+
+problems:
+  - {name: ackley, label: ackley_d10, d: 10}
+  - {name: ackley, label: ackley_d20, d: 20}
+  - {name: ackley, label: ackley_d30, d: 30}
+  - {name: ackley, label: ackley_d40, d: 40}
+  - {name: ackley, label: ackley_d50, d: 50}
+  - {name: ackley, label: ackley_d60, d: 60}
+  - {name: ackley, label: ackley_d70, d: 70}
+  - {name: ackley, label: ackley_d80, d: 80}
+  - {name: ackley, label: ackley_d90, d: 90}
+  - {name: ackley, label: ackley_d100, d: 100}
+  - {name: ackley, label: ackley_d150, d: 150}
+  - {name: ackley, label: ackley_d200, d: 200}
+  - {name: ackley, label: ackley_d300, d: 300}
+
+sweep:
+  base: {name: decentralized, mixing: {name: ring, lam: 0.5}, compute_z_mode: tracking}
+  num_nodes: [1, 2, 4, 8, 16, 32]
+
+plot:
+  x: problem.d
+  line: num_nodes
+
+cbo_kwargs:
+  dt: 0.05
+  sigma: 2.5
+  alpha: 1.0e-4
+  noise: anisotropic
+  f_dim: '3D'
+  verbosity: 0
+
+scheduler:
+  name: multiply
+  factor: 1.05
+  maximum: 1.0e+9
+
+resampling:
+  criteria:
+    - {name: ensemble_update, update_thresh: 1.0e-4}
+  sigma_indep: 0.1
