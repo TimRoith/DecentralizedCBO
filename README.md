@@ -2,7 +2,7 @@
 
 Code for the numerical experiments on decentralized consensus-based
 optimization. Nodes hold their own particle ensembles and exchange information
-only with their neighbours through a mixing matrix `W`; there is no central
+only with their neighbours through a mixing matrix `W`. There is no central
 coordinator.
 
 ## Install
@@ -26,7 +26,7 @@ experiment, `cma` only for the CMA-ES baseline.
 | `cma_baseline.py`, `sgd_baseline.py` | Baselines |
 | `config/` | One YAML per experiment |
 | `experiments/` | Runner, table builder and figure scripts |
-| `docs/companion.html` | Interactive companion to the linear model; open it in a browser, no build step |
+| `docs/companion.html` | Interactive companion to the linear model. Open it in a browser, no build step needed |
 
 ## Running an experiment
 
@@ -73,12 +73,12 @@ python plot_scaling_nodes.py scaling_nodes.yaml
 | `mixing_freq.yaml`, `mixing_freq_rastrigin.yaml` | `plot_scaling_nodes.py` | iterations between mixing steps |
 | `stability_grid.yaml`, `stability_sigma.yaml` | `plot_stability_grid.py` | step size and noise strength |
 
-`plot_consensus_formation.py` takes no config — it runs its own simulations and
+`plot_consensus_formation.py` takes no config. It runs its own simulations and
 writes `results/consensus_formation.{pdf,png}`.
 
 ## MNIST
 
-Download the data once before running `mnist_paper.yaml`; on a cluster do this
+Download the data once before running `mnist_paper.yaml`. On a cluster, do this
 on a login node, since compute nodes usually have no outbound network.
 
 ```bash
@@ -96,7 +96,7 @@ sbatch run_shards.sbatch benchmark_d100.yaml
 ```
 
 Because runs are cached per (method, problem, seed), a task that hits its wall
-clock can simply be resubmitted.
+clock can be resubmitted.
 
 ## Methods
 
@@ -106,7 +106,7 @@ spend the same number of evaluations per iteration:
 | Method | Ensemble | Coupling |
 |---|---|---|
 | `serial` | one ensemble of `total_particles` | a single consensus point |
-| `multirun` | `num_nodes` independent ensembles | none; best over runs |
+| `multirun` | `num_nodes` independent ensembles | none, best over runs |
 | `decentralized` | `num_nodes` ensembles | neighbours mixed by `W` |
 
 A method entry may set `label` to run several variants as separate rows.
@@ -114,8 +114,8 @@ A method entry may set `label` to run several variants as separate rows.
 thresholds can be changed without rerunning anything.
 
 Anything that evaluates the objective must go through `dyn.eval_f` rather than
-`dyn.f`: only `eval_f` maintains `dyn.num_f_eval`, which is what the harness
+`dyn.f`, since only `eval_f` maintains `dyn.num_f_eval`, which is what the harness
 uses to check that methods are budget-matched. The counter is per node and
 `eval_f` charges `x.shape[1]` to each active node, so passing a `(1, M, d)`
-block over-counts by a factor of `M`; `compute_z_consensus` therefore evaluates
+block over-counts by a factor of `M`. For this reason `compute_z_consensus` evaluates
 through `self.f` and charges one evaluation per node by hand.
