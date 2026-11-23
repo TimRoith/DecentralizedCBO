@@ -81,8 +81,8 @@ python fetch_data.py
 
 ## Cluster
 
-`run_shards.sbatch` runs a config as a Slurm job array. Adapt `#SBATCH -D`
-and the module and conda lines to your cluster, then run
+`run_shards.sbatch` runs a config as a Slurm job array. Set `#SBATCH -D`
+and the environment lines to your cluster, then run
 
 ```bash
 sbatch run_shards.sbatch benchmark_d100.yaml
