@@ -70,6 +70,9 @@ button{font-family:inherit;font-size:14px;color:var(--ink-soft);background:none;
 button:hover{color:var(--ink)}
 button.on{color:var(--ink);border-bottom-color:var(--ink)}
 .toggle{display:inline-flex;gap:14px}
+.note{font-size:15px;color:var(--ink);max-width:76ch;margin:16px 0 0}
+.note + .note{margin-top:.4em}
+.note b{font-weight:700}
 #b_play,#b_play.on{min-width:5.6em;padding:4px 14px;font-size:15px;color:var(--paper);
    background:var(--c1);border:0;border-radius:999px}
 #b_play:hover{filter:brightness(1.1)}
@@ -171,14 +174,12 @@ particles per node as in the paper; <span class="math">M</span> does not enter h
     <input type="range" id="s_k" min="0" max="20" step="1" value="1"><output id="o_k">1</output></span>
 </div>
 
-<p class="caption" style="margin-top:16px;max-width:76ch">
-On a ring <span class="math">W</span> is circulant with eigenvalues
-<span class="math">&gamma;<span class="sb">k</span></span> =
-<span class="math">&theta;</span> + (1&minus;<span class="math">&theta;</span>)cos(2&pi;<span class="math">k</span>/<span class="math">N</span>),
-where <span class="math">&theta;</span> is the self-weight, and the iteration splits into
-2&times;2 blocks indexed by <span class="math">k</span>.
+<p class="note">
+On a ring the dynamics split into independent harmonics <span class="math">k</span>,
+with eigenvalues <span class="math">&gamma;<span class="sb">k</span></span> =
+<span class="math">&theta;</span> + (1&minus;<span class="math">&theta;</span>)cos(2&pi;<span class="math">k</span>/<span class="math">N</span>).
 </p>
-<p class="caption" id="harmonic" style="margin-top:.5em;max-width:76ch"></p>
+<p class="note" id="harmonic"></p>
 
 <h2>Mode shapes: eigenvectors of <span class="math">L</span></h2>
 <p>
@@ -1475,10 +1476,6 @@ function fmt(x, sig){
   if (s.indexOf(".") >= 0) s = s.replace(/0+$/, "").replace(/\.$/, "");
   return s;
 }
-function fmtC(re, im){
-  var s = (im < 0 ? " − " : " + ") + fmt(Math.abs(im), 4) + "i";
-  return fmt(re, 5) + (Math.abs(im) < 1e-14 ? "" : s);
-}
 
 /* =====================================================================
    4.  Readouts
@@ -1486,39 +1483,17 @@ function fmtC(re, im){
 function updateReadout(){
   var el = document.getElementById("harmonic"), m = S.model;
   if (!m.ring){
-    el.innerHTML = "The modal decomposition is written for the ring; " +
-      S.topo.replace("_", " ") + " is stepped directly.";
+    el.innerHTML = "The harmonic readout is only available for the ring.";
     return;
   }
-  var k = Math.min(S.k, m.K - 1), mi = m.modes[k], a = m.a;
-  var l = (1 - mi.g) / S.dt;                     /* W = I - dt L */
-  var ndisc = l * l - 4 * l, nuTxt;
-  if (ndisc >= 0){
-    var r = Math.sqrt(ndisc);
-    nuTxt = fmt((-l + r) / 2, 5) + " and " + fmt((-l - r) / 2, 5);
-  } else {
-    nuTxt = fmtC(-l / 2, Math.sqrt(-ndisc) / 2) + " and its conjugate";
-  }
-  var character = mi.defective
-      ? "a defective double root, so it decays with a secular term"
-      : (mi.complex
-         ? "a complex pair, so it oscillates with period 2π/|arg μ| = " +
-           (isFinite(mi.period) ? fmt(mi.period, 5) + " iterations" : "—")
-         : "real, so it does not oscillate");
-  var mu = fmtC(mi.m0r, mi.m0i) +
-      (mi.defective || mi.complex ? "" : " and " + fmt(mi.m1r, 5));
+  var k = Math.min(S.k, m.K - 1), mi = m.modes[k];
+  var behaviour = mi.absmu > 1 ? "grows"
+      : mi.complex ? "oscillates with a period of " +
+          (isFinite(mi.period) ? fmt(mi.period, 4) + " iterations" : "—")
+      : "decays without oscillating";
   el.innerHTML =
-    "<b>Harmonic " + k + "</b> of 0…" + (m.K - 1) +
-    (m.bas.fac[k] === 2 ? ", paired with N−k" : ", self-conjugate") +
-    ". γ = " + fmt(mi.g, 8) + ", μ = " + mu +
-    ", |μ| = " + fmt(mi.absmu, 8) +
-    (mi.absmu > 1 ? " (above 1: this mode grows)" : "") + " — " + character +
-    ". Discriminant (1−γ)(1−γ−4a) = " + fmt(mi.disc, 4) +
-    ", with 1−γ = " + fmt(1 - mi.g, 4) + " against the oscillatory band " +
-    "(0, 4a) = (0, " + fmt(4 * a, 4) + "). In continuous time " +
-    "ℓ = (1−γ)/dt = " + fmt(l, 5) +
-    (l > 0 && l < 4 * S.lamda ? ", inside (0, 4λ), so it oscillates" : "") +
-    ", ν = " + nuTxt + ", envelope exp(−" + fmt(l / 2, 4) + " t).";
+    "<b>Harmonic " + k + "</b>: γ = " + fmt(mi.g, 6) +
+    ", |μ| = " + fmt(mi.absmu, 6) + ", " + behaviour + ".";
 }
 
 function updateCaptions(){
