@@ -80,9 +80,8 @@ button.on{color:var(--ink);border-bottom-color:var(--ink)}
 .off{opacity:.38;pointer-events:none}
 
 /* ---- footer ---- */
-.foot{margin-top:52px;padding-top:16px;border-top:1px solid var(--rule-soft);
-   font-size:13.5px;color:var(--ink-faint);max-width:72ch;line-height:1.55}
-.credit{margin-top:16px;font-size:12.5px;color:var(--ink-faint)}
+.credit{margin-top:52px;padding-top:16px;border-top:1px solid var(--rule-soft);
+   font-size:12.5px;color:var(--ink-faint)}
 </style>
 </head>
 <body>
@@ -218,20 +217,6 @@ block of its own mode.
     <span id="n_amp"></span></figcaption>
 </figure>
 
-<p class="foot">
-  Continuous time:
-  <span class="math">L</span> = (<span class="math">I</span> &minus; <span class="math">W</span>)/<span class="math">dt</span>
-  = ((1&minus;<span class="math">&theta;</span>)/<span class="math">dt</span>)&thinsp;<span class="math">L</span><span class="sb">rw</span>
-  &mdash; scaled by <span class="math">dt</span>, not a fixed graph Laplacian;
-  <span class="math">&theta;</span> = 1 &minus; <span class="math">dt</span>
-  puts its spectrum in [0,&thinsp;2].
-  <span class="math">U</span>&prime; = &minus;<span class="math">CU</span> with
-  <span class="math">C</span> = [[<span class="math">I</span>, &minus;<span class="math">I</span>],[<span class="math">I</span>, <span class="math">L</span>&minus;<span class="math">I</span>]];
-  per eigenvalue <span class="math">&ell;</span> of <span class="math">L</span>,
-  <span class="math">&nu;</span>&sup2; + <span class="math">&ell;&nu;</span> + <span class="math">&ell;</span> = 0,
-  complex for 0 &lt; <span class="math">&ell;</span> &lt; 4, real part
-  &minus;<span class="math">&ell;</span>/2.
-</p>
 <p class="credit">Produced with Claude Opus 5.</p>
 
 </div><!-- /wrap -->
@@ -240,9 +225,7 @@ block of its own mode.
 <script>
 "use strict";
 /* =====================================================================
-   1.  Maths.  Everything in this block is mirrored statement for
-       statement in docs/verify_js_math.py and checked against
-       docs/reference.json, so keep the two in step.
+   1.  Maths.
    ===================================================================== */
 var D = 2;                                   // the page is 2-dimensional
 var DOMAIN = [-5.12, 5.12];                  // RastriginProblem.domain
@@ -750,8 +733,7 @@ function aOf(){ return S.lamda * S.dt; }
 
 function buildModel(){
   var N = S.N, a = aOf(), T = S.T;
-  /* offset 0: Z0 = P0 exactly. The offset branch of initialState is kept
-     because docs/verify_js_math.py mirrors this block statement for statement. */
+  /* offset 0: Z0 = P0 exactly. */
   var ic = initialState(N, S.seed, 0);
   var P0 = ic.P0, Z0 = ic.Z0;
   var m = { N: N, a: a, T: T, P0: P0, Z0: Z0, ring: isRing() };
