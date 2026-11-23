@@ -21,7 +21,7 @@
   --rule:#d0cec9; --rule-soft:#e4e2de; --paper:#ffffff; --plate:#ffffff;
   --c1:#2a78d6; --c2:#eb6834;
   --serif:"Latin Modern Roman","Computer Modern Serif","CMU Serif",
-          "Nimbus Roman",Georgia,"Times New Roman",Times,serif;
+          "Palatino Linotype","Book Antiqua",Palatino,"P052","URW Palladio L",serif;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:var(--paper);color:var(--ink)}
@@ -70,6 +70,9 @@ button{font-family:inherit;font-size:14px;color:var(--ink-soft);background:none;
 button:hover{color:var(--ink)}
 button.on{color:var(--ink);border-bottom-color:var(--ink)}
 .toggle{display:inline-flex;gap:14px}
+#b_play,#b_play.on{min-width:5.6em;padding:4px 14px;font-size:15px;color:var(--paper);
+   background:var(--c1);border:0;border-radius:999px}
+#b_play:hover{filter:brightness(1.1)}
 :focus-visible{outline:1px solid var(--ink-faint);outline-offset:2px}
 .off{opacity:.38;pointer-events:none}
 
@@ -133,7 +136,7 @@ particles per node as in the paper; <span class="math">M</span> does not enter h
 <div class="controls">
   <span class="ctl"><span class="name">iteration</span>
     <input type="range" id="s_t" min="0" max="1500" step="1" value="0"><output id="o_t">0</output></span>
-  <span class="ctl"><button id="b_play">play</button><button id="b_rew">&#8676;&nbsp;0</button></span>
+  <span class="ctl"><button id="b_play">&#9654;&nbsp;play</button><button id="b_rew">&#8676;&nbsp;0</button></span>
   <span class="ctl"><span class="name">horizon</span>
     <select id="sel_T">
       <option value="auto" selected>auto</option>
@@ -1652,7 +1655,7 @@ function wire(){
   });
   $("b_play").addEventListener("click", function(){
     S.playing = !S.playing; this.classList.toggle("on", S.playing);
-    this.textContent = S.playing ? "pause" : "play";
+    this.textContent = S.playing ? "❚❚ pause" : "▶ play";
     playAcc = 0; lastFrame = 0;
     if (S.playing) requestAnimationFrame(tick);
   });
@@ -1766,6 +1769,9 @@ function tick(ts){
 (function(){
   wire();
   rebuild(true);
+  // Start playing, unless the visitor asked for reduced motion.
+  if (!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches))
+    $("b_play").click();
 })();
 </script>
 </body>
