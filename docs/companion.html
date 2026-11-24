@@ -90,8 +90,8 @@ button.on{color:var(--ink);border-bottom-color:var(--ink)}
 <em><a href="https://arxiv.org/abs/2611.27433">Consensus of Consensus: Decentralized Consensus-Based Optimization</a></em>, arXiv:2611.27433, 2026.</p>
 
 <p>
-In the linear model, decentralized CBO is run without noise and each node is
-reduced to its consensus point. The iteration is
+The noiseless decentralized CBO variant with a single particle per node can be
+written as
 </p>
 <p style="margin:.4em 0 .9em 1.5em">
 <span class="math">P&prime;</span> = (1&minus;<span class="math">a</span>)<span class="math">P</span> + <span class="math">aZ</span>,
@@ -103,9 +103,11 @@ reduced to its consensus point. The iteration is
 <p>
 where <span class="math">P</span> holds the positions of the <span class="math">N</span>
 nodes, <span class="math">Z</span> the tracking variables and <span class="math">W</span>
-the mixing matrix.
+the mixing matrix. Here <span class="math">&lambda;</span> is the drift strength and
+<span class="math">dt</span> the time-step size of the CBO discretization.
 Each harmonic performs a simple oscillation, and together they move the nodes
-in a rhythmic dance towards consensus: the <em>consensus ballet</em>.
+towards consensus in a rhythmic dance, which is thus called the
+<em>consensus ballet</em>.
 </p>
 
 <h2>Node positions and tracking variables</h2>
