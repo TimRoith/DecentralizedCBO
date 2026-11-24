@@ -103,9 +103,9 @@ reduced to its consensus point. The iteration is
 <p>
 where <span class="math">P</span> holds the positions of the <span class="math">N</span>
 nodes, <span class="math">Z</span> the tracking variables and <span class="math">W</span>
-the mixing matrix. Before reaching consensus, the nodes and their tracking
-variables circle around each other, which the paper calls the
-<em>consensus ballet</em>.
+the mixing matrix.
+Each harmonic performs a simple oscillation, and together they move the nodes
+in a rhythmic dance towards consensus: the <em>consensus ballet</em>.
 </p>
 
 <h2>Node positions and tracking variables</h2>
@@ -119,7 +119,7 @@ variables circle around each other, which the paper calls the
       <span class="key"><i class="dot z" style="background:#777"></i> tracking <span class="math">z<span class="sb">m</span></span></span>
       <span class="key"><i class="sw" style="border-top-color:#bbb"></i> ring order</span>
       <span class="key"><i class="sw" style="border-top-color:#1f988b;opacity:.5;border-top-width:1.2px"></i> <span class="math">c<span class="sb">m</span></span>&ndash;<span class="math">z<span class="sb">m</span></span></span>
-      <span class="key">colour = node index</span>
+      <span class="key">colour = position on the ring</span>
     </figcaption>
   </figure>
 
@@ -161,7 +161,7 @@ variables circle around each other, which the paper calls the
   <span class="ctl" id="row_rad"><span class="name">radius</span>
     <input type="range" id="s_rad" min="1" max="6" step="1" value="1"><output id="o_rad">1</output></span>
   <span class="ctl"><span class="name math">N</span>
-    <input type="range" id="s_N" min="5" max="400" step="1" value="40"><output id="o_N">40</output></span>
+    <input type="range" id="s_N" min="5" max="400" step="1" value="158"><output id="o_N">158</output></span>
   <span class="ctl"><span class="name math">&theta;</span>
     <input type="range" id="s_theta" min="0" max="1" step="0.005" value="0.5"><output id="o_theta">0.500</output></span>
   <span class="ctl"><span class="name math">dt</span>
@@ -654,7 +654,7 @@ function diameter(arrs, N){
 
 var NMODES = 10;
 var S = {
-  topo: "ring", N: 40, theta: 0.5, dt: 0.05, lamda: 1.0, seed: 49,
+  topo: "ring", N: 158, theta: 0.5, dt: 0.05, lamda: 1.0, seed: 49,
   T: 1500, t: 0, mode: "sum", k: 1, radius: 1,
   eig: null, active: null, model: null, playing: false
 };
@@ -687,7 +687,7 @@ function buildModel(){
   m.Zb2  = new Float64Array(N * D);
   m.Pb3  = new Float64Array(N * D);
   m.cols = [];
-  for (var j = 0; j < N; j++) m.cols.push(viridis(N > 1 ? j / (N - 1) : 0));
+  for (var j = 0; j < N; j++) m.cols.push(cyclic(j / N));
   return m;
 }
 
@@ -808,14 +808,21 @@ function singleMaskLocal(K, k){
 }
 
 var HUES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"];
-var VIRIDIS = ["#440154","#481a6c","#472f7d","#414487","#39568c","#31688e",
-               "#2a788e","#23888e","#1f988b","#22a884","#35b779","#54c568",
-               "#7ad151","#a5db36","#d2e21b","#fde725"];
-function viridis(u){
-  u = Math.max(0, Math.min(1, u));
-  var x = u * (VIRIDIS.length - 1), i = Math.floor(x), f = x - i;
-  if (i >= VIRIDIS.length - 1) return VIRIDIS[VIRIDIS.length - 1];
-  return mixHex(VIRIDIS[i], VIRIDIS[i + 1], f);
+function cyclic(u){
+  var h = 2 * Math.PI * u, L = 0.65, C = 0.17;
+  var A = C * Math.cos(h), B = C * Math.sin(h);
+  var l = Math.pow(L + 0.3963377774 * A + 0.2158037573 * B, 3);
+  var m = Math.pow(L - 0.1055613458 * A - 0.0638541728 * B, 3);
+  var s = Math.pow(L - 0.0894841775 * A - 1.2914855480 * B, 3);
+  var rgb = [ 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+             -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+             -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s];
+  for (var i = 0; i < 3; i++){
+    var x = Math.max(0, Math.min(1, rgb[i]));
+    x = x <= 0.0031308 ? 12.92 * x : 1.055 * Math.pow(x, 1 / 2.4) - 0.055;
+    rgb[i] = Math.round(255 * x);
+  }
+  return "rgb(" + rgb.join(",") + ")";
 }
 function mixHex(A, B, f){
   var a = parseInt(A.slice(1), 16), b = parseInt(B.slice(1), 16);
